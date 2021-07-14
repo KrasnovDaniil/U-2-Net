@@ -11,6 +11,7 @@ def detect_single_face(face_cascade,img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Detect faces
+    # --> Вот тут опеределение лица!
     faces = face_cascade.detectMultiScale(gray, 1.1, 4)
     if(len(faces)==0):
         print("Warming: no face detection, the portrait u2net will run on the whole image!")
@@ -27,6 +28,7 @@ def detect_single_face(face_cascade,img):
 
     return faces[idx]
 
+# --> преобразование изображения
 # crop, pad and resize face region to 512x512 resolution
 def crop_face(img, face):
 
@@ -96,6 +98,7 @@ def normPRED(d):
 
     return dn
 
+# --> вывод результатов
 def inference(net,input):
 
     # normalize the input
@@ -145,6 +148,7 @@ def main():
         os.mkdir(out_dir)
 
     # Load the cascade face detection model
+    # --> какая-то другая модель
     face_cascade = cv2.CascadeClassifier('./saved_models/face_detection_cv2/haarcascade_frontalface_default.xml')
     # u2net_portrait path
     model_dir = './saved_models/u2net_portrait/u2net_portrait.pth'
@@ -164,8 +168,11 @@ def main():
         # load each image
         img = cv2.imread(im_list[i])
         height,width = img.shape[0:2]
+        # --> видимо, главная функция, которая будет определять лицо на портрете
         face = detect_single_face(face_cascade,img)
+        # --> spike
         im_face = crop_face(img, face)
+        # --> 
         im_portrait = inference(net,im_face)
 
         # save the output
