@@ -5,9 +5,11 @@ import torch.nn.functional as F
 class REBNCONV(nn.Module):
     def __init__(self,in_ch=3,out_ch=3,dirate=1):
         super(REBNCONV,self).__init__()
-
+        # --> Применяте 2д свёртку для входного слоя
         self.conv_s1 = nn.Conv2d(in_ch,out_ch,3,padding=1*dirate,dilation=1*dirate)
+        # --> просто нормализация батча
         self.bn_s1 = nn.BatchNorm2d(out_ch)
+        # --> применяте релу
         self.relu_s1 = nn.ReLU(inplace=True)
 
     def forward(self,x):
@@ -319,10 +321,10 @@ class U2NET(nn.Module):
 
     def __init__(self,in_ch=3,out_ch=1):
         super(U2NET,self).__init__()
-
+        # --> RSU-7 формирует архитектуру U-Net из 7-ми энкодеров и 7 декодеров
         self.stage1 = RSU7(in_ch,32,64)
         self.pool12 = nn.MaxPool2d(2,stride=2,ceil_mode=True)
-
+        # --> RSU-6 аналогично 6 encoders и 6 decoders 
         self.stage2 = RSU6(64,32,128)
         self.pool23 = nn.MaxPool2d(2,stride=2,ceil_mode=True)
 
