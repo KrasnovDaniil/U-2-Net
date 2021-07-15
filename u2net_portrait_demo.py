@@ -11,7 +11,7 @@ def detect_single_face(face_cascade,img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Detect faces
-    # --> Вот тут опеределение лица!
+    # --> опеределение bounded box'ов лиц!
     faces = face_cascade.detectMultiScale(gray, 1.1, 4)
     if(len(faces)==0):
         print("Warming: no face detection, the portrait u2net will run on the whole image!")
@@ -31,6 +31,7 @@ def detect_single_face(face_cascade,img):
 # --> преобразование изображения
 # crop, pad and resize face region to 512x512 resolution
 def crop_face(img, face):
+    
 
     # no face detected, return the whole image and the inference will run on the whole image
     if(face is None):
@@ -98,7 +99,7 @@ def normPRED(d):
 
     return dn
 
-# --> вывод результатов
+# --> передача данных (изображения) в U2NET
 def inference(net,input):
 
     # normalize the input
@@ -123,6 +124,7 @@ def inference(net,input):
         tmpImg = Variable(tmpImg)
 
     # inference
+    # --> здесь преобразованное изображение в виде тензора(ов) подаётся на вход модели U2-NET (net)
     d1,d2,d3,d4,d5,d6,d7= net(tmpImg)
 
     # normalization
@@ -155,11 +157,14 @@ def main():
 
     # load u2net_portrait model
     net = U2NET(3,1)
+    # --> загружает данные модели (state_dict), переданной функцией torch.load(model_dir)
+    # --> в модель net
     net.load_state_dict(torch.load(model_dir))
     if torch.cuda.is_available():
         net.cuda()
+    # --> устанавливает режим модели в evaluation mode, то есть self.train=False
     net.eval()
-
+    
     # do the inference one-by-one
     for i in range(0,len(im_list)):
         print("--------------------------")
@@ -172,7 +177,7 @@ def main():
         face = detect_single_face(face_cascade,img)
         # --> spike
         im_face = crop_face(img, face)
-        # --> 
+        # --> вывод
         im_portrait = inference(net,im_face)
 
         # save the output
